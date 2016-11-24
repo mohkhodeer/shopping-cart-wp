@@ -37,7 +37,21 @@
             });
 
             jQuery('#checkout').click(function(){
-                jQuery('#action').val('checkout');
+                var user_email = jQuery('#user_email').val();
+                if(user_email!='' && user_email){
+                    var pattern = /^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
+                    if(!pattern.test(user_email)){
+                        alert('Please enter a valid email to confirm checkout');
+                        return false;
+                    }
+                }
+                else{
+                    alert('Email is empty!');
+                    return false;
+                }
+                jQuery('#cart_form').attr('action', "<?php echo get_template_directory_uri().'/cart/cart_checkout.php'; ?>");
+                jQuery('#cart_form').submit();
+
             });
 
         });
@@ -108,8 +122,6 @@
                 <?php
                 /*** shopping cart ***/
                 global $wp;
-                /*$_SESSION["product_codes"][1]='PR0000008';
-                $_SESSION["product_codes"][2]='PR0000007';*/
                 $current_url = home_url(add_query_arg(array(), $wp->request));
                 if (isset($_SESSION["cart_products"]) && count($_SESSION["cart_products"]) > 0) {
                     echo '<div class="cart-view-table-front" id="view-cart">';
@@ -119,55 +131,80 @@
                     echo '<tbody>';
 
                     $total = 0;
+                    $total_old = 0;
                     $b = 0;
-                    /*** remove duplicated products codes ***/
 
-                    /*echo '<pre>';
-                    print_r($_SESSION["cart_products"]);
+                    echo '<pre>';
+                    //print_r($_SESSION["cart_products"]);
                     print_r($_SESSION["product_codes"]);
                     print_r($_SESSION["product_attrs"]);
-                    echo '</pre>';*/
-                    /*** remove duplicated products codes# ***/
+                    echo '</pre>';
 
                     /*** listing cart items ***/
                     $j=0;
                     foreach(array_unique($_SESSION["product_codes"]) as $product_code){
                         foreach ($_SESSION["cart_products"][$product_code] as $cart_itm) {
+                            /*** if there is any empty row in cart should be deleted ***/
+                            if(!isset($cart_itm['product_id'])){
+                                unset($cart_itm);
+                                continue;
+                            }
+                            /*** if there is any empty row in cart should be deleted# ***/
+                            /*echo "<pre>";
+                            print_r($cart_itm);
+                            echo "</pre>";*/
                             $product_name = $cart_itm["product_name"];
                             $product_qty = $cart_itm["product_qty"];
                             $product_price = $cart_itm["product_price"];
                             $product_code = $cart_itm["product_code"];
                             $product_attributes = implode(',',$cart_itm["attributes"]);
                             $subtotal = ($product_price * $product_qty);
+                            $subtotal_old = ($cart_itm['old_price'] * $product_qty);
+                            $product_discount = $cart_itm['product_discount'];
+                            if($product_discount!='' && $product_discount>0) {
+                                $product_discount_txt = '<span style="color:#FF8067;display:block;">'. $product_discount .'% Off</span>';
+                                $product_old_price_txt = '$'.$cart_itm['old_price'];
+                            }
+                            else{
+                                $product_discount_txt='';
+                                $product_old_price_txt='';
+                            }
                             $total = ($total + $subtotal);
+                            $total_old = ($total_old + $subtotal_old);
                             $bg_color = ($b++ % 2 == 1) ? 'odd' : 'even'; //zebra stripe
                             echo '<tr class="' . $bg_color . '">';
                             echo '<td>Qty <input type="text" size="4" maxlength="4" name="product_qty['.$product_code.']['.$product_attributes.']" value="' . $product_qty . '" /></td>';
-                            echo '<td>' . $product_name .'<span style="color:#FF8067"> ( '.$product_attributes. ' )</span></td>';
+                            echo '<td><a style="color:#555" href="'.get_permalink($cart_itm["product_id"]).'">' . $product_name .'<span style="color:#FF8067"> ( '.$product_attributes. ' )</span></a></td>';
                             echo '<td><input type="checkbox" class="remove_cart_row" id="'.$j.'" name="remove_code[]" value="' . $product_code . '*'.$product_attributes.'" /> Remove</td>';
-                            echo '<td>Subtotal: $' . $subtotal . '</td>';
+                            echo '<td>
+                            Subtotal: <span style="font-size:11px;color:#555;text-decoration: line-through;">'
+                                .$product_old_price_txt.'</span> <span style="font-size:12px;">$'. $subtotal .'</span>'.
+                                $product_discount_txt.'</td>';
                             echo '</tr>';
                             $j++;
                         }
                     }
 
+                    $_SESSION["cart_products"]['total'] = $total;
+                    $_SESSION["cart_products"]['total_old'] = $total_old;
                     echo '<td colspan="3">';
                     echo '<input type="hidden" name="cart_row_idx" id="cart_row_idx" >';
                     echo '<button id="submit" type="submit">Update</button>
-                    <button id="checkout" type="submit">Checkout</button>';
+                    <div class="checkout_div">
+                    <input type="email" id="user_email" name="user_email" >
+                    <button id="checkout" type="submit">Checkout</button>
+                    </div>';
                     echo '</td>';
-                    echo '<td>Total: $' . $total . '</td>';
+                    echo '<td style="color:#FF8067;font-weight:bold;font-size:15px">Total: $' . $total . '</td>';
                     echo '</tbody>';
                     echo '</table>';
                     echo '<input type="hidden" name="return_url" value="' . $current_url . '" />';
-                    echo '<input type="hidden" name="action" id="action" />';
                     echo '</form>';
                     echo '</div>';
 
                 }
                 /*** listing cart items# ***/
                 /*** shopping cart! ***/
-                //unset($_SESSION['cart_products']['PR0000007']['XXXL,Green']);
                 ?>
                 <a style="color:#555;margin:0 10px" href="#"><?php echo __('Login') ?></a>
                 <a class="fa fa-search" href="#" title="Twitter" target="_blank"></a>

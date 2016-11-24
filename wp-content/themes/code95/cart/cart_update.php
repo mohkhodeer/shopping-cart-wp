@@ -8,31 +8,7 @@ get_header();
 //add product to session or create new one
 
 
-if (isset($_POST["action"]) && $_POST["action"] == 'checkout'){
-    $product_codes_unique = array_values(array_unique($_SESSION["product_codes"]));
-    foreach($product_codes_unique as $prod_code){
-        $qty_sum =0;
-        $prod_id =0;
-        $prod_list = array_keys(($_SESSION["cart_products"][$prod_code]));
-        foreach($prod_list as $prod){
-            $qty_sum += (integer)$_SESSION["cart_products"][$prod_code][$prod]['product_qty'];
-            $prod_id = $_SESSION["cart_products"][$prod_code][$prod]['product_id'];
-        }
-        $stock_qty = get_field('quantity',$prod_id);
-        if($prod_id!=0 && $prod_id!='' && $qty_sum!=''){
-            if(($stock_qty-$qty_sum)>=0){
-                update_field( 'quantity', ($stock_qty-$qty_sum), $prod_id );
-                //Checkout Done Successfully
-            }
-            else {
-                //Invalid quantity
-            }
-        }
-
-    }
-    die;
-}
-elseif (isset($_POST["type"]) && $_POST["type"] == 'add' && $_POST["product_qty"] > 0) {
+if (isset($_POST["type"]) && $_POST["type"] == 'add' && $_POST["product_qty"] > 0) {
     $i = 0;
     foreach ($_POST as $key => $value) { //add all post vars to new_product array
         $new_product[$key] = filter_var($value, FILTER_SANITIZE_STRING);
@@ -49,7 +25,15 @@ elseif (isset($_POST["type"]) && $_POST["type"] == 'add' && $_POST["product_qty"
 
     //fetch product name, price from db and add to new_product array
     $new_product["product_name"] = $product->post_name;
-    $new_product["product_price"] = get_field('price', $product->ID);
+    $product_price = get_field('price', $product->ID);
+    $product_discount = get_field('discount_percentage', $product->ID);
+    if($product_discount!='' && $product_discount!=0){
+        $new_product["product_discount"] = $product_discount;
+        $new_product["old_price"] = $product_price;
+        $product_price = $product_price-($product_price*$product_discount/100);
+    }
+    $new_product["product_price"] = $product_price;
+
     //get product attributes and use them as an index
     $attr_index = implode(',', $new_product['attributes']);
 
@@ -113,7 +97,7 @@ $product_codes_tmp = ($_SESSION["product_codes"]);
 $_SESSION["product_codes"] = array_values($product_codes_tmp);
 $product_attrs_tmp = array_unique($_SESSION["product_attrs"]);
 $_SESSION["product_attrs"] = array_values($product_attrs_tmp);
-die;
+
 //back to return url
 $return_url = (isset($_POST["return_url"])) ? urldecode($_POST["return_url"]) : ''; //return url
 echo '<script type="text/javascript">';

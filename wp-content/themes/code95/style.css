@@ -4385,3 +4385,22 @@ ul.shopping-cart .cart-itm .remove-itm a{
     width:auto;
     padding: 5px;
 }
+.checkout_div{
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    display: inline-block;
+    float: right;
+    margin: 5px;
+    padding: 0 5px;
+}
+.checkout_div input{margin: 5px 5px 5px 0;border: 1px solid #ff8067;}
+.checkout_div #checkout{margin: 5px 0 5px 5px;}
+#form_product .small_img:hover img{
+    box-shadow: 0 0 10px #aaa;
+    height: 200px;
+    margin-left: -1px;
+    margin-top: -1px;
+    max-width: none;
+    width: 160px;
+    z-index: 99999;
+}

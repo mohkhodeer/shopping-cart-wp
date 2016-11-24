@@ -138,8 +138,22 @@ else $is_product = 0;
             </div>
 
             <div class="row">
-                <?php $cat = get_the_category(); ?>
-                <div class="big_price">$<?php echo get_field('price') ?></div>
+                <?php
+                $cat = get_the_category();
+                $price = get_field('price');
+                $discount_price = get_field('discount_percentage');
+                $price_after_discount =0;
+                if($discount_price!='' && $discount_price!=0)
+                {
+                    $price_after_discount = $price-($price*$discount_price/100);
+                }
+                ?>
+                <div class="big_price"><?php if($price_after_discount>0){
+                        echo "<span style='color:#555;font-size:20px;text-decoration: line-through;'>$".$price."</span> ";
+                        echo '$'.$price_after_discount;
+                    }
+                    else echo '$'.$price;
+                ?></div>
                 <button type="submit" class="buy_btn add_to_cart"><i style="font-size: 20px;margin-right: 10px;" class="fa fa-shopping-cart red"
                                         aria-hidden="true"></i> <?php echo __('Buy this ') . $cat[0]->name; ?></button>
             </div>
