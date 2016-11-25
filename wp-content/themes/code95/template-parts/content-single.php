@@ -176,7 +176,8 @@ else $is_product = 0;
 ];
 
         $my_query = new wp_query( $args );
-        $related_products = $my_query->posts; ?>    
+        $related_products = $my_query->posts; ?>
+        <div class="clear"></div>
         <div id="related_products">
         <div class="title"><?php echo __('Related products');?></div>
         <ul>

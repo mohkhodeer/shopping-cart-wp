@@ -37,16 +37,15 @@ if (isset($_POST["type"]) && $_POST["type"] == 'add' && $_POST["product_qty"] > 
     //get product attributes and use them as an index
     $attr_index = implode(',', $new_product['attributes']);
 
-
     if (isset($_SESSION["cart_products"])) {  //if session var already exist
         if (isset($_SESSION["cart_products"][$new_product['product_code']][$attr_index])) //check item exist in products array
         {
             unset($_SESSION["cart_products"][$new_product['product_code']][$attr_index]); //unset old array item
         }
     }
+
     if($new_product!='' && isset($new_product) && is_array($new_product))
         $_SESSION["cart_products"][$new_product['product_code']][$attr_index] = $new_product; //update or create product session with new item}
-
 
     /*** create one array containing cart products codes and another one containing the corresponding attributes***/
     //these arrays are used when removing products from cart and get the items count
@@ -95,9 +94,9 @@ unset($_SESSION["cart_products"]['']);
 //reindex removed session array items
 $product_codes_tmp = ($_SESSION["product_codes"]);
 $_SESSION["product_codes"] = array_values($product_codes_tmp);
-$product_attrs_tmp = array_unique($_SESSION["product_attrs"]);
+$product_attrs_tmp = ($_SESSION["product_attrs"]);
 $_SESSION["product_attrs"] = array_values($product_attrs_tmp);
-
+//die('##');
 //back to return url
 $return_url = (isset($_POST["return_url"])) ? urldecode($_POST["return_url"]) : ''; //return url
 echo '<script type="text/javascript">';

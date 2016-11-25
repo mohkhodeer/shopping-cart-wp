@@ -134,54 +134,55 @@
                     $total_old = 0;
                     $b = 0;
 
-                    echo '<pre>';
-                    //print_r($_SESSION["cart_products"]);
-                    print_r($_SESSION["product_codes"]);
-                    print_r($_SESSION["product_attrs"]);
-                    echo '</pre>';
+//                    echo '<pre>';
+//                    print_r($_SESSION["cart_products"]);
+//                    print_r($_SESSION["product_codes"]);
+//                    print_r($_SESSION["product_attrs"]);
+//                    echo '</pre>';
 
                     /*** listing cart items ***/
                     $j=0;
-                    foreach(array_unique($_SESSION["product_codes"]) as $product_code){
-                        foreach ($_SESSION["cart_products"][$product_code] as $cart_itm) {
-                            /*** if there is any empty row in cart should be deleted ***/
-                            if(!isset($cart_itm['product_id'])){
-                                unset($cart_itm);
-                                continue;
-                            }
-                            /*** if there is any empty row in cart should be deleted# ***/
-                            /*echo "<pre>";
-                            print_r($cart_itm);
-                            echo "</pre>";*/
-                            $product_name = $cart_itm["product_name"];
-                            $product_qty = $cart_itm["product_qty"];
-                            $product_price = $cart_itm["product_price"];
-                            $product_code = $cart_itm["product_code"];
-                            $product_attributes = implode(',',$cart_itm["attributes"]);
-                            $subtotal = ($product_price * $product_qty);
-                            $subtotal_old = ($cart_itm['old_price'] * $product_qty);
-                            $product_discount = $cart_itm['product_discount'];
-                            if($product_discount!='' && $product_discount>0) {
-                                $product_discount_txt = '<span style="color:#FF8067;display:block;">'. $product_discount .'% Off</span>';
-                                $product_old_price_txt = '$'.$cart_itm['old_price'];
-                            }
-                            else{
-                                $product_discount_txt='';
-                                $product_old_price_txt='';
-                            }
-                            $total = ($total + $subtotal);
-                            $total_old = ($total_old + $subtotal_old);
-                            $bg_color = ($b++ % 2 == 1) ? 'odd' : 'even'; //zebra stripe
-                            echo '<tr class="' . $bg_color . '">';
-                            echo '<td>Qty <input type="text" size="4" maxlength="4" name="product_qty['.$product_code.']['.$product_attributes.']" value="' . $product_qty . '" /></td>';
-                            echo '<td><a style="color:#555" href="'.get_permalink($cart_itm["product_id"]).'">' . $product_name .'<span style="color:#FF8067"> ( '.$product_attributes. ' )</span></a></td>';
-                            echo '<td><input type="checkbox" class="remove_cart_row" id="'.$j.'" name="remove_code[]" value="' . $product_code . '*'.$product_attributes.'" /> Remove</td>';
-                            echo '<td>
+                    if(isset($_SESSION["product_codes"])) {
+                        foreach (array_unique($_SESSION["product_codes"]) as $product_code) {
+                            foreach ($_SESSION["cart_products"][$product_code] as $cart_itm) {
+                                /*** if there is any empty row in cart should be deleted ***/
+                                if (!isset($cart_itm['product_id'])) {
+                                    unset($cart_itm);
+                                    continue;
+                                }
+                                /*** if there is any empty row in cart should be deleted# ***/
+                                /*echo "<pre>";
+                                print_r($cart_itm);
+                                echo "</pre>";*/
+                                $product_name = $cart_itm["product_name"];
+                                $product_qty = $cart_itm["product_qty"];
+                                $product_price = $cart_itm["product_price"];
+                                $product_code = $cart_itm["product_code"];
+                                $product_attributes = implode(',', $cart_itm["attributes"]);
+                                $subtotal = ($product_price * $product_qty);
+                                $subtotal_old = ($cart_itm['old_price'] * $product_qty);
+                                $product_discount = $cart_itm['product_discount'];
+                                if ($product_discount != '' && $product_discount > 0) {
+                                    $product_discount_txt = '<span style="color:#FF8067;display:block;">' . $product_discount . '% Off</span>';
+                                    $product_old_price_txt = '$' . $cart_itm['old_price'];
+                                } else {
+                                    $product_discount_txt = '';
+                                    $product_old_price_txt = '';
+                                }
+                                $total = ($total + $subtotal);
+                                $total_old = ($total_old + $subtotal_old);
+                                $bg_color = ($b++ % 2 == 1) ? 'odd' : 'even'; //zebra stripe
+                                echo '<tr class="' . $bg_color . '">';
+                                echo '<td>Qty <input type="text" size="4" maxlength="4" name="product_qty[' . $product_code . '][' . $product_attributes . ']" value="' . $product_qty . '" /></td>';
+                                echo '<td><a style="color:#555" href="' . get_permalink($cart_itm["product_id"]) . '">' . $product_name . '<span style="color:#FF8067"> ( ' . $product_attributes . ' )</span></a></td>';
+                                echo '<td><input type="checkbox" class="remove_cart_row" id="' . $j . '" name="remove_code[]" value="' . $product_code . '*' . $product_attributes . '" /> Remove</td>';
+                                echo '<td>
                             Subtotal: <span style="font-size:11px;color:#555;text-decoration: line-through;">'
-                                .$product_old_price_txt.'</span> <span style="font-size:12px;">$'. $subtotal .'</span>'.
-                                $product_discount_txt.'</td>';
-                            echo '</tr>';
-                            $j++;
+                                    . $product_old_price_txt . '</span> <span style="font-size:12px;">$' . $subtotal . '</span>' .
+                                    $product_discount_txt . '</td>';
+                                echo '</tr>';
+                                $j++;
+                            }
                         }
                     }
 
