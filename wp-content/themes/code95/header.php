@@ -160,14 +160,16 @@
                                 $product_code = $cart_itm["product_code"];
                                 $product_attributes = implode(',', $cart_itm["attributes"]);
                                 $subtotal = ($product_price * $product_qty);
-                                $subtotal_old = ($cart_itm['old_price'] * $product_qty);
+                                $subtotal_old = (((integer)$cart_itm['old_price']) * $product_qty);
                                 $product_discount = $cart_itm['product_discount'];
                                 if ($product_discount != '' && $product_discount > 0) {
                                     $product_discount_txt = '<span style="color:#FF8067;display:block;">' . $product_discount . '% Off</span>';
-                                    $product_old_price_txt = '$' . $cart_itm['old_price'];
+                                    $product_old_price_txt = '$' . $subtotal_old;
                                 } else {
                                     $product_discount_txt = '';
                                     $product_old_price_txt = '';
+                                    $store_price_without_discount_only =0;
+                                    $store_price_without_discount_only += ($product_price * $product_qty);
                                 }
                                 $total = ($total + $subtotal);
                                 $total_old = ($total_old + $subtotal_old);
@@ -187,7 +189,7 @@
                     }
 
                     $_SESSION["cart_products"]['total'] = $total;
-                    $_SESSION["cart_products"]['total_old'] = $total_old;
+                    $_SESSION["cart_products"]['total_old'] = $total_old+$store_price_without_discount_only;
                     echo '<td colspan="3">';
                     echo '<input type="hidden" name="cart_row_idx" id="cart_row_idx" >';
                     echo '<button id="submit" type="submit">Update</button>
