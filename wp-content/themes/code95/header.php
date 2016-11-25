@@ -206,7 +206,7 @@
                 /*** listing cart items# ***/
                 /*** shopping cart! ***/
                 ?>
-                <a style="color:#555;margin:0 10px" href="#"><?php echo __('Login') ?></a>
+                <a style="color:#555;margin:0 10px" href="<?php echo get_site_url();?>/login"><?php echo __('Login') ?></a>
                 <a class="fa fa-search" href="#" title="Twitter" target="_blank"></a>
                 <a class="fa fa-twitter" href="#" title="Twitter" target="_blank"></a>
                 <a class="fa fa-vimeo-square" href="#" title="Twitter" target="_blank"></a>
