@@ -60,8 +60,8 @@ if (isset($_POST) && is_array($_POST)){
             $qty_sum += (integer)$_SESSION["cart_products"][$prod_code][$prod]['product_qty'];
             $prod_id = $_SESSION["cart_products"][$prod_code][$prod]['product_id'];
         }
-        $stock_qty = get_field('quantity',$prod_id);
         if($prod_id!=0 && $prod_id!='' && $qty_sum!=''){
+            $stock_qty = get_field('quantity',$prod_id);
             if(($stock_qty-$qty_sum)>=0){
                 //Checkout Done Successfully
                 update_field( 'quantity', ($stock_qty-$qty_sum), $prod_id );
